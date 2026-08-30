@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>arcron-vesting — waiting for first accrue</title>
+  <link rel="stylesheet" href="./style.css" />
+</head>
+<body>
+  <main class="crt" id="crt">
+    <header>
+      <h1>Vesting</h1>
+      <div class="meta">TestNet · unaudited · pull-not-push</div>
+    </header>
+
+    <section class="status-row">
+      <div class="label">Board</div>
+      <div class="destination grounded" id="headline">VESTING — waiting for first accrue</div>
+      <div class="meta" id="subhead">not deployed</div>
+    </section>
+
+    <section class="board">
+      <div class="cell">
+        <div class="label">Locked µALGO</div>
+        <div class="flaps" id="locked" aria-label="locked microalgos"></div>
+      </div>
+      <div class="cell">
+        <div class="label">Credited µALGO</div>
+        <div class="flaps" id="credited" aria-label="credited microalgos"></div>
+      </div>
+      <div class="cell">
+        <div class="label">Claimed µALGO</div>
+        <div class="flaps" id="claimed" aria-label="claimed microalgos"></div>
+      </div>
+      <div class="cell">
+        <div class="label">Last accrue round</div>
+        <div class="flaps" id="last-accrue" aria-label="last accrue round"></div>
+      </div>
+    </section>
+
+    <p class="notes" id="notes">
+      Read-only status board. No wallet. Flip <code>docs/deploy.json</code>
+      after TestNet create. The hook credits; the beneficiary pulls with
+      <code>claim()</code>. A missed hook does not unlock funds on its own.
+    </p>
+    <p class="err" id="err" hidden></p>
+  </main>
+  <script>
+    const INDEXER = "https://testnet-idx.algonode.cloud";
+
+    function flaps(el, text, width) {
+      const s = String(text).padStart(width, " ").slice(-width);
+      el.replaceChildren();
+      for (const ch of s) {
+        const d = document.createElement("span");
+        d.className = "flap" + (ch === " " ? " blank" : "");
+        d.textContent = ch === " " ? "0" : ch;
+        el.appendChild(d);
+      }
+    }
+
+    function b64utf8(b64) {
+      try { return atob(b64); } catch { return ""; }
+    }
+
+    function readGlobal(state, name) {
+      if (!Array.isArray(state)) return null;
+      for (const kv of state) {
+        if (b64utf8(kv.key) !== name) continue;
+        if (kv.value && kv.value.type === 2) return kv.value.uint;
+        if (kv.value && kv.value.type === 1) return kv.value.bytes;
+        return null;
+      }
+      return null;
+    }
+
+    async function main() {
+      flaps(document.getElementById("locked"), "0", 12);
+      flaps(document.getElementById("credited"), "0", 12);
+      flaps(document.getElementById("claimed"), "0", 12);
+      flaps(document.getElementById("last-accrue"), "0", 10);
+
+      let cfg;
+      try {
+        const res = await fetch("./deploy.json", { cache: "no-store" });
+        if (!res.ok) throw new Error("deploy.json " + res.status);
+        cfg = await res.json();
+      } catch (e) {
+        document.getElementById("err").hidden = false;
+        document.getElementById("err").textContent = "Could not read deploy.json";
+        return;
+      }
+
+      const appId = Number(cfg.appId) || 0;
+      const headline = document.getElementById("headline");
+      const subhead = document.getElementById("subhead");
+
+      if (appId <= 0) {
+        headline.textContent = "VESTING — waiting for first accrue";
+        headline.className = "destination grounded";
+        subhead.textContent = (cfg.notes || "not deployed") + " · keeper " + (cfg.keeperAppId || "—");
+        document.title = "arcron-vesting — waiting for first accrue";
+        return;
+      }
+
+      subhead.textContent = "app " + appId + " · upkeep " + (cfg.upkeepId || "—") + " · " + (cfg.network || "testnet");
+      try {
+        const res = await fetch(INDEXER + "/v2/applications/" + appId);
+        if (!res.ok) throw new Error("indexer " + res.status);
+        const body = await res.json();
+        const g = (body.params && body.params["global-state"]) || [];
+        const locked = readGlobal(g, "locked");
+        const credited = readGlobal(g, "credited");
+        const claimed = readGlobal(g, "claimed");
+        const last = readGlobal(g, "last_accrue_round");
+        flaps(document.getElementById("locked"), locked == null ? "—" : String(locked), 12);
+        flaps(document.getElementById("credited"), credited == null ? "—" : String(credited), 12);
+        flaps(document.getElementById("claimed"), claimed == null ? "—" : String(claimed), 12);
+        flaps(document.getElementById("last-accrue"), last == null ? "—" : String(last), 10);
+        if (!credited) {
+          headline.textContent = "VESTING — waiting for first accrue";
+          headline.className = "destination grounded";
+          document.title = "arcron-vesting — waiting for first accrue";
+        } else {
+          headline.textContent = "LIVE";
+          headline.className = "destination live";
+          document.title = "arcron-vesting — credited " + credited;
+        }
+      } catch (e) {
+        headline.textContent = "GROUNDED";
+        headline.className = "destination grounded";
+        document.getElementById("err").hidden = false;
+        document.getElementById("err").textContent = "Indexer unreachable; appId is set but state was not read.";
+      }
+    }
+
+    main();
+  </script>
+</body>
+</html>

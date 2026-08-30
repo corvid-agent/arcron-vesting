@@ -1,0 +1,10 @@
+{
+  "appId": 0,
+  "upkeepId": 0,
+  "network": "testnet",
+  "keeperAppId": 769891898,
+  "hook": "accrue()uint64",
+  "executeTxid": "",
+  "claimTxid": "",
+  "notes": "not done — unattended TestNet dispensers (bank.testnet, AWS, Lora) require captcha or ALGOKIT_DISPENSER_ACCESS_TOKEN; live create/register/execute/claim not completed; do not invent txids"
+}
