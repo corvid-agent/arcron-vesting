@@ -48,10 +48,12 @@ If `DEPLOYER_MNEMONIC` is unset the scripts keep an ephemeral key in memory and 
 
 ## LocalNet recreate (not TestNet)
 
-Create, `set_keeper(Application(...))`, and a mock-keeper inner-call of `accrue()` were proven on AlgoKit LocalNet (`dockernet-v1`). That is **not** TestNet. Do **not** copy any LocalNet app id into `docs/deploy.json` or Pages. `appId` stays 0 until a real TestNet create.
+Create, `set_keeper(Application(...))`, a mock-keeper inner-call of `accrue()`, and a beneficiary `claim()` were proven on AlgoKit LocalNet (`dockernet-v1`). That is **not** TestNet. Do **not** copy any LocalNet app id into `docs/deploy.json` or treat it as TestNet. TestNet `appId` stays 0 until a real TestNet create.
 
-LocalNet ids are ephemeral (DevMode / reset). They are not a product and they are not for GitHub Pages.
-LocalNet proof for Pages lives in `docs/localnet.json` (CRT shows it when present). `docs/deploy.json` stays honest TestNet `appId: 0`.
+This pass (2026-08-31 ~12:07 PM MT): `python scripts/localnet_recreate.py` created Vesting **appId 1024** at confirmed round **19** (`createTxid` in `docs/localnet.json`). Then `python scripts/localnet_listen.py` created mock keeper **1025**, inner-called `accrue` (1 inner), and the beneficiary pulled. Global after listen: locked=credited=claimed=1_000_000 µALGO, last_accrue_round=25. LocalNet last-round after listen: 26. Did not spend the TestNet bank. Did not poke upkeep 81 or 87.
+
+LocalNet ids are ephemeral (DevMode / reset). They are not a product. They are not TestNet explorer links.
+LocalNet proof for Pages lives in `docs/localnet.json` and `docs/listen.json` (CRT shows them when present). `docs/deploy.json` stays honest TestNet `appId: 0`.
 
 ```bash
 # Docker daemon required
@@ -61,11 +63,13 @@ algokit localnet start
 pip install puyapy py-algorand-sdk
 python scripts/localnet_recreate.py
 # writes docs/localnet.json with network:"localnet" and the new appId
+python scripts/localnet_listen.py
+# set_keeper + configure + fund + mock accrue + claim; writes docs/listen.json
 ```
 
-The script talks only to `localhost:4001` / `4002`, signs with the LocalNet KMD
-`unencrypted-default-wallet` (never prints a mnemonic), refuses TestNet/MainNet
-genesis ids, and never modifies `docs/deploy.json`.
+Both scripts talk only to `localhost:4001` / `4002`, sign with the LocalNet KMD
+`unencrypted-default-wallet` (never print a mnemonic), refuse TestNet/MainNet
+genesis ids, and never modify `docs/deploy.json`.
 
 DevMode holds last-round at 0 until the first tx. A successful create is a confirmed
 `application-index` on genesis id `dockernet-v1`, not a TestNet explorer link.
@@ -84,7 +88,7 @@ DevMode holds last-round at 0 until the first tx. A successful create is a confi
 ## What does not work
 
 - The hook **cannot push ALGO**. Arcron's inner call only reaches resources the keeper named; the hook moves nothing, calls nothing, and names no extra accounts. The beneficiary is not an available resource. That is why crediting is accounting and `claim()` is a pull.
-- CI is compile + static hook tests, not a LocalNet execute.
+- CI is compile + static hook/honesty tests, not a LocalNet execute. LocalNet recreate/listen are box-side against localhost:4001.
 - No TestNet create, no upkeep, no execute, no claim. Dispenser captcha/401. appId stays 0.
 - Pages board stays NOT DEPLOYED until `docs/deploy.json` `appId` is flipped after a real create.
 - If `accrue` never runs, claimable stays 0 even after the vest clock. This demo is hook-credits-only: a missed hook means the beneficiary waits. `claim` does not recompute the vest.

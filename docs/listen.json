@@ -1,0 +1,73 @@
+{
+  "network": "localnet",
+  "genesisId": "dockernet-v1",
+  "algod": "http://localhost:4001",
+  "appId": 1024,
+  "appAddress": "H7IXNOUTWLLAMFQFB2O74B7OZCQSZ47YK3IGIZU4CP6LONZMVALFPUGGQY",
+  "mockKeeperAppId": 1025,
+  "mockKeeperCreateTxid": "RNW6X7P4EXUD46MWRLWTO7ZQE744OE7EHNYJ6IZZYSPL4QN6AJUA",
+  "mockKeeperConfirmedRound": 20,
+  "mockKeeperFundTxid": "4JC2GUF2D2BMG6BZCNM3EZRKHULAPLUAX44UPGCK7P5QKX3HNJQQ",
+  "mockKeeperFundRound": 21,
+  "creator": "TOZ2LQRCEJH44IDHE2W35XGO2BUJROS2G62VI4BTFEUEUFCOGDHKENJSKI",
+  "lastRound": 26,
+  "listened_at": "2026-08-31T18:10:58.908859+00:00",
+  "calls": [
+    {
+      "method": "set_keeper",
+      "txid": "OLOTU3VG74ZUW62SFTQDCYRQGU4JIK3YBD3JKMASBN2MKP76P57A",
+      "round": 22,
+      "success": true,
+      "innerCount": 0,
+      "keeperAppId": 1025
+    },
+    {
+      "method": "configure",
+      "txid": "RHXBWNVCXH2G2VI2CYAG7T6VW3LGQ5RXASRLGCVQKJV6BGMUOCZA",
+      "round": 23,
+      "success": true,
+      "innerCount": 0,
+      "beneficiary": "TOZ2LQRCEJH44IDHE2W35XGO2BUJROS2G62VI4BTFEUEUFCOGDHKENJSKI",
+      "startRound": 0,
+      "durationRounds": 1
+    },
+    {
+      "method": "fund",
+      "txid": "N7X2OSS23QZ6RBXIFBWTQ33HNT3DKLIM2332LKHLISRZBL3YVXAQ",
+      "round": 24,
+      "success": true,
+      "innerCount": 0,
+      "paymentMicroAlgos": 1100000,
+      "principalMicroAlgos": 1000000
+    },
+    {
+      "method": "accrue",
+      "txid": "24M5ILLBFBG5O6EPOHA2UOIG4JOJSL47OAVKJSRKE3I3MTQYFOOQ",
+      "round": 25,
+      "success": true,
+      "innerCount": 1,
+      "targetAppId": 1024,
+      "hook": "accrue",
+      "via": "mock_keeper.accrue"
+    },
+    {
+      "method": "claim",
+      "txid": "7T6CXJYZYRKWABF3KWKEP4WC4VTJ3L4BUCEO5RB7DXVDOEHUVOUA",
+      "round": 26,
+      "success": true,
+      "innerCount": 1,
+      "hook": "claim",
+      "via": "beneficiary_pull"
+    }
+  ],
+  "global": {
+    "keeper_app": 1025,
+    "locked": 1000000,
+    "credited": 1000000,
+    "claimed": 1000000,
+    "last_accrue_round": 25,
+    "duration_rounds": 1,
+    "start_round": 0
+  },
+  "notes": "LocalNet-only listen proof. Do NOT copy this appId into docs/deploy.json or treat it as TestNet. TestNet stays appId 0 until a real TestNet create. Did not spend TestNet bank. Did not poke upkeep 81 or 87."
+}
