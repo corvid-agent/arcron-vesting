@@ -46,6 +46,20 @@ python scripts/deploy.py claim --app-id <id>
 
 If `DEPLOYER_MNEMONIC` is unset the scripts keep an ephemeral key in memory and print the address to fund from a dispenser.
 
+## LocalNet recreate (not TestNet)
+
+Create, `set_keeper(Application(...))`, and a mock-keeper inner-call of `accrue()` were proven on AlgoKit LocalNet (`dockernet-v1`). That is **not** TestNet. Do **not** copy any LocalNet app id into `docs/deploy.json` or Pages. `appId` stays 0 until a real TestNet create.
+
+```bash
+algokit localnet start
+# algod http://localhost:4001
+# create with ZERO constructor args — do not pass 769891898
+# set_keeper(Application(<local keeper>))  # Application, never itob(keeper id)
+# inner-call accrue() from the keeper app account
+```
+
+LocalNet ids are ephemeral (DevMode / reset). They are not a product and they are not for GitHub Pages.
+
 ## Measured cost
 
 | item | µALGO |
