@@ -50,15 +50,26 @@ If `DEPLOYER_MNEMONIC` is unset the scripts keep an ephemeral key in memory and 
 
 Create, `set_keeper(Application(...))`, and a mock-keeper inner-call of `accrue()` were proven on AlgoKit LocalNet (`dockernet-v1`). That is **not** TestNet. Do **not** copy any LocalNet app id into `docs/deploy.json` or Pages. `appId` stays 0 until a real TestNet create.
 
+LocalNet ids are ephemeral (DevMode / reset). They are not a product and they are not for GitHub Pages.
+LocalNet proof for Pages lives in `docs/localnet.json` (CRT shows it when present). `docs/deploy.json` stays honest TestNet `appId: 0`.
+
 ```bash
+# Docker daemon required
 algokit localnet start
-# algod http://localhost:4001
-# create with ZERO constructor args — do not pass 769891898
-# set_keeper(Application(<local keeper>))  # Application, never itob(keeper id)
-# inner-call accrue() from the keeper app account
+# wait until localhost:4001 /v2/status answers
+
+pip install puyapy py-algorand-sdk
+python scripts/localnet_recreate.py
+# writes docs/localnet.json with network:"localnet" and the new appId
 ```
 
-LocalNet ids are ephemeral (DevMode / reset). They are not a product and they are not for GitHub Pages.
+The script talks only to `localhost:4001` / `4002`, signs with the LocalNet KMD
+`unencrypted-default-wallet` (never prints a mnemonic), refuses TestNet/MainNet
+genesis ids, and never modifies `docs/deploy.json`.
+
+DevMode holds last-round at 0 until the first tx. A successful create is a confirmed
+`application-index` on genesis id `dockernet-v1`, not a TestNet explorer link.
+
 
 ## Measured cost
 

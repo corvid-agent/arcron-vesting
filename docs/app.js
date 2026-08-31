@@ -159,6 +159,25 @@ async function loadConfig() {
   return res.json();
 }
 
+
+async function loadLocalnetProof() {
+  const el = document.getElementById("localnet-proof");
+  if (!el) return;
+  try {
+    const res = await fetch("./localnet.json", { cache: "no-store" });
+    if (!res.ok) return;
+    const ln = await res.json();
+    if (!ln || ln.network !== "localnet" || !(Number(ln.appId) > 0)) return;
+    el.hidden = false;
+    el.textContent =
+      "LocalNet proof · app " + ln.appId +
+      " · " + (ln.genesisId || "dockernet") +
+      " · not TestNet (see docs/localnet.json)";
+  } catch (_) {
+    /* optional file */
+  }
+}
+
 async function main() {
   flaps(document.getElementById("accrue"), "0", 10);
   flaps(document.getElementById("remaining"), "0", 12);
@@ -182,6 +201,7 @@ async function main() {
   if (appId <= 0) {
     paint("NOT DEPLOYED", "grounded", "VESTING — NOT DEPLOYED");
     subhead.textContent = "not deployed · keeper " + keeper;
+    await loadLocalnetProof();
     return;
   }
 
