@@ -6,7 +6,7 @@ on:
   pull_request:
 
 jobs:
-  compile:
+  check:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -15,7 +15,9 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - name: Install puyapy
-        run: pip install puyapy
+      - name: Static hook checks
+        run: |
+          python -m pip install -r requirements-dev.txt
+          python -m pytest tests/ -q
       - name: Compile vesting contract
         run: puyapy smart_contracts/vesting/contract.py --out-dir smart_contracts/artifacts/vesting --resource-encoding value

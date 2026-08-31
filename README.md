@@ -2,6 +2,11 @@
 
 Scheduled TestNet release of a locked ALGO balance to a beneficiary — pull-not-push, driven by Arcron keeper 769891898.
 
+## Pull-not-push: accrue() is accounting only
+
+The hook cannot push ALGO. Arcron `execute` inner-calls `accrue()` with the method selector only: no payment, no inner transaction, no extra accounts from the keeper. `accrue` only writes `credited` from the linear vest. The beneficiary pulls with `claim()` in their own transaction.
+
+
 ## Live proof
 
 **not done** — this commit ships the compiling contract, CI, Pages stub, and scripts. Live TestNet create / register / execute / claim were not confirmed, so ids are zeros. Never invent txids.
@@ -54,10 +59,13 @@ If `DEPLOYER_MNEMONIC` is unset the scripts keep an ephemeral key in memory and 
 ## What does not work
 
 - The hook **cannot push ALGO**. Arcron's inner call only reaches resources the keeper named; the hook moves nothing, calls nothing, and names no extra accounts. The beneficiary is not an available resource. That is why crediting is accounting and `claim()` is a pull.
+- CI is compile + static hook tests, not a LocalNet execute.
+- No TestNet create, no upkeep, no execute, no claim. Dispenser captcha/401. appId stays 0.
+- Pages board stays NOT DEPLOYED until `docs/deploy.json` `appId` is flipped after a real create.
 - If `accrue` never runs, claimable stays 0 even after the vest clock. This demo is hook-credits-only: a missed hook means the beneficiary waits. `claim` does not recompute the vest.
 - TestNet keeper 769891898 may be late. Interval 30 is the demo floor so ordinary lateness is not treated as a signal. Arcron min is 10.
 - No MainNet. Scripts refuse a MainNet algod URL.
 
 ## Honesty block
 
-Unaudited. TestNet only. Upgradeable keeper is a rug vector: the creator can `set_keeper` again and retarget (including stalling credit so the beneficiary never becomes claimable). Throwaway dispenser. Not a product. Do not send real funds.
+Unaudited. TestNet only. First-party demo, not a product. No MainNet path; scripts refuse a MainNet algod URL. Do not send mainnet funds. Keeper 769891898. Throwaway dispenser. Apache-2.0. Pull pattern: the schedule accounts; the beneficiary pulls; the hook cannot push. Hook is `accrue()`, zero args. Auth is `Application(keeper).address`, never `itob`. Upgradeable keeper is a rug vector: the creator can `set_keeper` again and retarget (including stalling credit so the beneficiary never becomes claimable).
