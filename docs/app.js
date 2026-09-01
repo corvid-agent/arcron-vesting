@@ -171,6 +171,7 @@ async function loadLocalnetProof() {
     el.hidden = false;
     let line =
       "LocalNet proof · app " + ln.appId +
+      " · round " + (ln.confirmedRound != null ? ln.confirmedRound : "—") +
       " · " + (ln.genesisId || "dockernet") +
       " · not TestNet (see docs/localnet.json)";
     try {
@@ -179,9 +180,14 @@ async function loadLocalnetProof() {
         const listen = await lr.json();
         if (listen && listen.network === "localnet" && Number(listen.appId) === Number(ln.appId)) {
           const g = listen.global || {};
+          const when = listen.listened_at
+            ? " · heard " + String(listen.listened_at).replace(/\.\d+/, "").replace("Z", "Z")
+            : "";
           line +=
+            " · mock keeper " + (listen.mockKeeperAppId || "—") +
             " · accrue round " + (g.last_accrue_round || "—") +
             " · claimed " + (g.claimed || 0) +
+            when +
             " (see docs/listen.json)";
         }
       }
