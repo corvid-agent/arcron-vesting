@@ -183,10 +183,26 @@ async function loadLocalnetProof() {
           const when = listen.listened_at
             ? " · heard " + String(listen.listened_at).replace(/\.\d+/, "").replace("Z", "Z")
             : "";
+          const locked = Number(g.locked || 0);
+          const claimed = Number(g.claimed || 0);
+          const remaining = Math.max(0, locked - claimed);
+          // Paint LocalNet listen onto flaps so the CRT is not empty zeros
+          // while TestNet deploy.json stays appId 0. Never treat this as TestNet.
+          flaps(document.getElementById("accrue"), String(g.last_accrue_round || 0), 10);
+          flaps(document.getElementById("remaining"), String(remaining), 12);
+          if (listen.mockKeeperAppId) {
+            flaps(document.getElementById("keeper"), String(listen.mockKeeperAppId), 10);
+          }
+          const calls = Array.isArray(listen.calls) ? listen.calls : [];
+          const cfgCall = calls.find((c) => c && c.method === "configure" && c.beneficiary);
+          if (cfgCall && cfgCall.beneficiary) {
+            document.getElementById("beneficiary").textContent = cfgCall.beneficiary;
+          }
           line +=
             " · mock keeper " + (listen.mockKeeperAppId || "—") +
             " · accrue round " + (g.last_accrue_round || "—") +
-            " · claimed " + (g.claimed || 0) +
+            " · claimed " + claimed +
+            " · remaining " + remaining +
             when +
             " (see docs/listen.json)";
         }
