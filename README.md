@@ -50,10 +50,10 @@ If `DEPLOYER_MNEMONIC` is unset the scripts keep an ephemeral key in memory and 
 
 Create, `set_keeper(Application(...))`, a mock-keeper inner-call of `accrue()`, and a beneficiary `claim()` were proven on AlgoKit LocalNet (`dockernet-v1`). That is **not** TestNet. Do **not** copy any LocalNet app id into `docs/deploy.json` or treat it as TestNet. TestNet `appId` stays 0 until a real TestNet create.
 
-This pass (2026-09-02 ~10:03 AM MT): `python scripts/localnet_recreate.py` created Vesting **appId 1152** at confirmed round **121** (`createTxid` in `docs/localnet.json`). Then `python scripts/localnet_listen.py` created mock keeper **1153**, inner-called `accrue` (1 inner), and the beneficiary pulled. Global after listen: locked=credited=claimed=1_000_000 µALGO, last_accrue_round=127. LocalNet last-round after listen: 128. Did not spend the TestNet bank. Did not poke upkeep 81 or 87.
+This pass (2026-09-02 ~2:44 PM MT): `python scripts/localnet_recreate.py` created Vesting **appId 1191** at confirmed round **152** (`createTxid` in `docs/localnet.json`). Then `python scripts/localnet_listen.py` created mock keeper **1192**, inner-called `accrue` (1 inner), and the beneficiary pulled. Global after listen: locked=credited=claimed=1_000_000 µALGO, last_accrue_round=158. LocalNet last-round after listen: 159. Did not spend the TestNet bank. Did not poke upkeep 81 or 87.
 
 LocalNet ids are ephemeral (DevMode / reset). They are not a product. They are not TestNet explorer links.
-LocalNet proof for Pages lives in `docs/localnet.json` and `docs/listen.json` (CRT shows them when present). `docs/deploy.json` stays honest TestNet `appId: 0`.
+LocalNet proof for Pages lives in `docs/localnet.json` and `docs/listen.json` (CRT shows them when present). `docs/history.json` appends LocalNet listen samples for the phosphor escrow / remaining graphs (in-page sql.js). `node scripts/append_history.mjs` appends from `listen.json` without touching `deploy.json`. `docs/deploy.json` stays honest TestNet `appId: 0`.
 
 ```bash
 # Docker daemon required

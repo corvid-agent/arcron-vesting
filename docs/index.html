@@ -41,16 +41,39 @@
       </div>
     </section>
 
+    <section class="graphs" id="graphs" aria-label="vest escrow graphs">
+      <div class="graph-cell">
+        <div class="label">Escrow µALGO</div>
+        <canvas id="escrow-canvas" width="640" height="160" aria-label="locked credited claimed bars"></canvas>
+        <div class="graph-legend">
+          <span class="lg locked">locked</span>
+          <span class="lg credited">credited</span>
+          <span class="lg claimed">claimed</span>
+        </div>
+      </div>
+      <div class="graph-cell">
+        <div class="label">LocalNet history · remaining</div>
+        <canvas id="history-canvas" width="640" height="160" aria-label="remaining over LocalNet proofs"></canvas>
+        <div class="meta" id="history-meta">sqlite 0 samples</div>
+      </div>
+      <div class="graph-cell wide">
+        <div class="label">Call timeline</div>
+        <canvas id="timeline-canvas" width="640" height="120" aria-label="set_keeper configure fund accrue claim"></canvas>
+      </div>
+    </section>
+
     <p class="meta" id="localnet-proof" hidden></p>
     <p class="notes" id="notes">
       Read-only status board. No wallet. TestNet: flip <code>docs/deploy.json</code>
       after TestNet create. The hook credits; the beneficiary pulls with
       <code>claim()</code>. Remaining is locked − claimed. A missed hook does
-      not unlock funds on its own. Keeper
+      not unlock funds on its own. Graphs paint LocalNet listen history when
+      TestNet <code>appId</code> is 0 — never treat those ids as TestNet. Keeper
       <a href="https://testnet.explorer.perawallet.app/application/769891898">769891898</a>.
     </p>
     <p class="err" id="err" hidden></p>
   </main>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.11.0/sql-wasm.js"></script>
   <script src="./app.js"></script>
 </body>
 </html>
