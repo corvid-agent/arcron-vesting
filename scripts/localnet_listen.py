@@ -95,12 +95,19 @@ def params(algod: AlgodClient, fee: int = 2000):
     return sp
 
 
-def funded_account(algod: AlgodClient, kmd: KMDClient) -> tuple[str, bytes]:
+def funded_account(
+    algod: AlgodClient, kmd: KMDClient, prefer: str | None = None
+) -> tuple[str, bytes]:
     wallets = kmd.list_wallets()
     wallet = next(w for w in wallets if w.get("name") == "unencrypted-default-wallet")
     handle = kmd.init_wallet_handle(wallet["id"], "")
     try:
         keys = kmd.list_keys(handle)
+        if prefer and prefer != BANK and prefer in keys:
+            amt = int(algod.account_info(prefer).get("amount") or 0)
+            if amt >= 1_000_000:
+                pk = kmd.export_key(handle, "", prefer)
+                return prefer, pk
         best = None
         best_amt = -1
         for addr in keys:
@@ -229,9 +236,11 @@ def main() -> None:
     creator = (live.get("params") or {}).get("creator")
     print(f"target Vesting appId={app_id} creator={creator}", file=sys.stderr)
 
-    addr, pk = funded_account(algod, kmd)
+    addr, pk = funded_account(algod, kmd, prefer=creator)
     if addr == BANK:
         sys.exit("refusing to sign as TestNet bank")
+    if creator and addr != creator:
+        sys.exit(f"refusing: signer {addr} is not Vesting creator {creator}")
     signer = AccountTransactionSigner(pk)
     print(f"deployer {addr} localnet_micro={algod.account_info(addr).get('amount')}", file=sys.stderr)
 
