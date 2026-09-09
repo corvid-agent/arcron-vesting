@@ -13,7 +13,7 @@
   <main class="crt" id="crt">
     <header>
       <h1>Vesting</h1>
-      <div class="meta">TestNet · unaudited · pull-not-push</div>
+      <div class="meta" id="network-meta">LocalNet proof only · not on TestNet · unaudited · pull-not-push</div>
     </header>
 
     <section class="status-row">
@@ -64,11 +64,12 @@
 
     <p class="meta" id="localnet-proof" hidden></p>
     <p class="notes" id="notes">
-      Read-only status board. No wallet. TestNet: flip <code>docs/deploy.json</code>
-      after TestNet create. The hook credits; the beneficiary pulls with
+      Read-only status board. No wallet. Live board is LocalNet-only until
+      <code>docs/deploy.json</code> <code>appId</code> is a real TestNet create
+      (currently 0 — not deployed). The hook credits; the beneficiary pulls with
       <code>claim()</code>. Remaining is locked − claimed. A missed hook does
       not unlock funds on its own. Graphs paint LocalNet listen history when
-      TestNet <code>appId</code> is 0 — never treat those ids as TestNet. Keeper
+      TestNet <code>appId</code> is 0 — never treat LocalNet ids as TestNet. Keeper
       <a href="https://testnet.explorer.perawallet.app/application/769891898">769891898</a>.
     </p>
     <p class="err" id="err" hidden></p>
