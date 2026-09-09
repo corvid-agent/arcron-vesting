@@ -23,6 +23,11 @@ function paint(status, cls, title) {
   document.title = title;
 }
 
+function setNetworkMeta(text) {
+  const el = document.getElementById("network-meta");
+  if (el) el.textContent = text;
+}
+
 function b64utf8(b64) {
   try { return atob(b64); } catch { return ""; }
 }
@@ -456,6 +461,7 @@ async function main() {
   } catch (e) {
     document.getElementById("err").hidden = false;
     document.getElementById("err").textContent = "Could not read deploy.json";
+    setNetworkMeta("network unknown · do not assume TestNet · unaudited");
     await loadHistoryGraphs(null);
     return;
   }
@@ -467,11 +473,13 @@ async function main() {
 
   if (appId <= 0) {
     paint("NOT DEPLOYED", "grounded", "VESTING — NOT DEPLOYED");
-    subhead.textContent = "not deployed · keeper " + keeper;
+    setNetworkMeta("LocalNet proof only · not on TestNet · unaudited · pull-not-push");
+    subhead.textContent = "not deployed · keeper " + keeper + " · LocalNet only";
     await loadLocalnetProof();
     return;
   }
 
+  setNetworkMeta("TestNet · unaudited · pull-not-push");
   subhead.textContent = "app " + appId + " · upkeep " + (cfg.upkeepId || "—") + " · " + (cfg.network || "testnet");
   try {
     const res = await fetch(INDEXER + "/v2/applications/" + appId);
