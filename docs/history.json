@@ -178,5 +178,20 @@
     "remaining": 0,
     "calls": 5,
     "source": "docs/listen.json"
+  },
+  {
+    "t": "2026-09-09T23:49:22.752795+00:00",
+    "network": "localnet",
+    "genesisId": "dockernet-v1",
+    "appId": 1103,
+    "mockKeeperAppId": 1104,
+    "lastRound": 91,
+    "locked": 1000000,
+    "credited": 1000000,
+    "claimed": 1000000,
+    "last_accrue_round": 90,
+    "remaining": 0,
+    "calls": 5,
+    "source": "docs/listen.json"
   }
 ]
